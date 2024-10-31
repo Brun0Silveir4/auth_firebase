@@ -11,27 +11,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.*
 import com.example.firebaseauth.ui.theme.FirebaseAuthTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.example.firebaseauth.App
+import com.google.firebase.firestore.ktx.firestore
+
 
 class MainActivity : ComponentActivity() {
 
-    val auth = Firebase.auth
+    private val auth = Firebase.auth
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             FirebaseAuthTheme {
-                LoginScreen(auth)
+                AppNavigation(auth)
             }
         }
     }
 }
 
 @Composable
-fun LoginScreen(auth: com.google.firebase.auth.FirebaseAuth) {
+fun AppNavigation(auth: com.google.firebase.auth.FirebaseAuth) {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            LoginScreen(auth, navController)
+        }
+        composable("home") {
+            val db = Firebase.firestore
+            App(db)
+        }
+    }
+}
+
+@Composable
+fun LoginScreen(auth: com.google.firebase.auth.FirebaseAuth, navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isRegistering by remember { mutableStateOf(false) }
@@ -82,6 +103,7 @@ fun LoginScreen(auth: com.google.firebase.auth.FirebaseAuth) {
                                         Log.i("Auth", "Usuário registrado com sucesso!")
                                         email = ""
                                         password = ""
+                                        navController.navigate("home")
                                     } else {
                                         Log.e("Auth", "Erro ao registrar: ${task.exception?.message}")
                                     }
@@ -93,6 +115,7 @@ fun LoginScreen(auth: com.google.firebase.auth.FirebaseAuth) {
                                         Log.i("Auth", "Login realizado com sucesso!")
                                         email = ""
                                         password = ""
+                                        navController.navigate("home")
                                     } else {
                                         Log.e("Auth", "Erro ao entrar: ${task.exception?.message}")
                                     }
@@ -120,10 +143,11 @@ fun LoginScreen(auth: com.google.firebase.auth.FirebaseAuth) {
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
     FirebaseAuthTheme {
-        LoginScreen(Firebase.auth)
+        AppNavigation(Firebase.auth)
     }
 }
