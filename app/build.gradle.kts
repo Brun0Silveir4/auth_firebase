@@ -69,9 +69,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.ui.auth)
     implementation(libs.firebase.auth)
-    implementation(platform(libs.firebase.bom))
     implementation("androidx.navigation:navigation-compose:2.7.3")
     implementation(libs.firebase.firestore)
 }
